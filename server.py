@@ -26,7 +26,16 @@ def index():
 
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
+    try:
+        club = [club for club in clubs if club['email'] == request.form['email']][0]
+    except IndexError:
+        if request.form['email'] == '':
+            flash('The email address cannot be empty', 'error')
+        else:
+            flash('Invalid email address', 'error')
+
+        return render_template('index.html'), 400
+    
     return render_template('welcome.html',club=club,competitions=competitions)
 
 
