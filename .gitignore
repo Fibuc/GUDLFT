@@ -1,7 +1,9 @@
 bin
+scripts
 include
 lib
 .Python
-tests/
 .envrc
+private/
+pyvenv.cfg
 __pycache__
