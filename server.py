@@ -1,6 +1,6 @@
 from flask import Flask,render_template,request,redirect,flash,url_for
 
-from utils import loadCompetitions, loadClubs
+from utils import loadCompetitions, loadClubs, updateCompetitionPoints
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
@@ -41,11 +41,17 @@ def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
+
     if placesRequired > int(club['points']):
         flash('You do not have enough points to book that many places.')
         return render_template('booking.html', club=club, competition=competition), 400
 
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
+    elif placesRequired > 12:
+        flash('You cannot book more than 12 places per competition.')
+        return render_template('booking.html', club=club, competition=competition), 400
+
+    competition['numberOfPlaces'] = str(int(competition['numberOfPlaces'])-placesRequired)
+    updateCompetitionPoints(competition)
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
 

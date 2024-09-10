@@ -51,27 +51,51 @@ class TestShowSummary:
 class TestPurchasePlaces:
 
     def test_purchase_success(self, client):
+        initial_places = int(MOCK_COMPETITION[0]['numberOfPlaces'])
+        places_booked = 5
         with patch('server.clubs', MOCK_CLUB), patch('server.competitions', MOCK_COMPETITION):
             response = client.post(
                 '/purchasePlaces',
                 data={
                     'competition': 'Competition test',
                     'club': 'Club test',
-                    'places': '5'
+                    'places': str(places_booked)
                 }
             )
             assert response.status_code == 200
             assert b'Great-booking complete!' in response.data
+            expected_places = initial_places - places_booked
+            assert int(MOCK_COMPETITION[0]['numberOfPlaces']) == expected_places
 
+    @patch('server.clubs', MOCK_CLUB)
+    @patch('server.competitions', MOCK_COMPETITION)
     def test_purchase_not_enough_club_points(self, client):
-        with patch('server.clubs', MOCK_CLUB), patch('server.competitions', MOCK_COMPETITION):
-            response = client.post(
-                '/purchasePlaces',
-                data={
-                    'competition': 'Competition test',
-                    'club': 'Club test',
-                    'places': '12'
-                }
-            )
-            assert response.status_code == 400
-            assert b'You do not have enough points to book that many places.' in response.data
+        response = client.post(
+            '/purchasePlaces',
+            data={
+                'competition': 'Competition test',
+                'club': 'Club test',
+                'places': '12'
+            }
+        )
+        assert response.status_code == 400
+        assert b'You do not have enough points to book that many places.' in response.data
+
+    @patch('server.clubs', [{
+        'name':'Club test','email':'club@example.com','points':'20'
+    }])
+    @patch('server.competitions', [{
+    'name': 'Competition test', 'date': '2020-10-22 13:30:00',
+    'numberOfPlaces': '20'
+    }])
+    def test_purchase_more_than_12_places(self, client):
+        response = client.post(
+            '/purchasePlaces',
+            data={
+                'competition': 'Competition test',
+                'club': 'Club test',
+                'places': '15'
+            }
+        )
+        assert response.status_code == 400
+        assert b'You cannot book more than 12 places per competition.' in response.data
