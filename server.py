@@ -47,7 +47,7 @@ def purchase_places():
         flash('You cannot book places for an event that has already passed.')
         return render_template('booking.html', club=club, competition=competition), 400
 
-    elif placesRequired > int(club['points']):
+    elif placesRequired > club['points']:
         flash('You do not have enough points to book that many places.')
         return render_template('booking.html', club=club, competition=competition), 400
 
@@ -56,8 +56,8 @@ def purchase_places():
         return render_template('booking.html', club=club, competition=competition), 400
 
 
-    competition['numberOfPlaces'] = str(int(competition['numberOfPlaces'])-placesRequired)
-    club['points'] = str(int(club['points'])-placesRequired)
+    competition['numberOfPlaces'] = competition['numberOfPlaces']-placesRequired
+    club['points'] = club['points']-placesRequired
     update_points_and_places(competition, club)
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)

@@ -2,15 +2,15 @@ from tests.conftests import client
 from unittest.mock import patch
 
 MOCK_CLUB = [{
-    'name':'Club test',
-    'email':'club@example.com',
-    'points':'8'
+    'name': 'Club test',
+    'email': 'club@example.com',
+    'points': 8
 }]
 
 MOCK_COMPETITION = [{
     'name': 'Competition test',
     'date': '2024-10-22 13:30:00',
-    'numberOfPlaces': '7'
+    'numberOfPlaces': 7
 }]
 
 class TestShowSummary:
@@ -51,7 +51,7 @@ class TestShowSummary:
 class TestPurchasePlaces:
 
     def test_purchase_success(self, client):
-        initial_places = int(MOCK_COMPETITION[0]['numberOfPlaces'])
+        initial_places = MOCK_COMPETITION[0]['numberOfPlaces']
         places_booked = 5
         with patch('server.clubs', MOCK_CLUB), patch('server.competitions', MOCK_COMPETITION):
             response = client.post(
@@ -59,7 +59,7 @@ class TestPurchasePlaces:
                 data={
                     'competition': 'Competition test',
                     'club': 'Club test',
-                    'places': str(places_booked)
+                    'places': places_booked
                 }
             )
             assert response.status_code == 200
@@ -75,18 +75,18 @@ class TestPurchasePlaces:
             data={
                 'competition': 'Competition test',
                 'club': 'Club test',
-                'places': '12'
+                'places': 12
             }
         )
         assert response.status_code == 400
         assert b'You do not have enough points to book that many places.' in response.data
 
     @patch('server.clubs', [{
-        'name':'Club test','email':'club@example.com','points':'20'
+        'name':'Club test','email':'club@example.com','points': 20
     }])
     @patch('server.competitions', [{
     'name': 'Competition test', 'date': '2024-10-22 13:30:00',
-    'numberOfPlaces': '20'
+    'numberOfPlaces': 20
     }])
     def test_purchase_more_than_12_places(self, client):
         response = client.post(
@@ -103,7 +103,7 @@ class TestPurchasePlaces:
     @patch('server.clubs', MOCK_CLUB)
     @patch('server.competitions', [{
     'name': 'Competition test', 'date': '2020-10-22 13:30:00',
-    'numberOfPlaces': '20'
+    'numberOfPlaces': 20
     }])
     def test_purchase_event_already_passed(self, client):
         response = client.post(
@@ -111,7 +111,7 @@ class TestPurchasePlaces:
             data={
                 'competition': 'Competition test',
                 'club': 'Club test',
-                'places': '5'
+                'places': 5
             }
         )
         assert response.status_code == 400
