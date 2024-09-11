@@ -1,6 +1,6 @@
 from flask import Flask,render_template,request,redirect,flash,url_for
 
-from utils import load_competitions, load_clubs, update_competition_points, has_event_passed
+from utils import load_competitions, load_clubs, update_points_and_places, has_event_passed
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
@@ -43,7 +43,11 @@ def purchase_places():
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
 
-    if placesRequired > int(club['points']):
+    if has_event_passed(competition['date']):
+        flash('You cannot book places for an event that has already passed.')
+        return render_template('booking.html', club=club, competition=competition), 400
+
+    elif placesRequired > int(club['points']):
         flash('You do not have enough points to book that many places.')
         return render_template('booking.html', club=club, competition=competition), 400
 
@@ -51,12 +55,10 @@ def purchase_places():
         flash('You cannot book more than 12 places per competition.')
         return render_template('booking.html', club=club, competition=competition), 400
 
-    elif has_event_passed(competition['date']):
-        flash('You cannot book places for an event that has already passed.')
-        return render_template('booking.html', club=club, competition=competition), 400
 
     competition['numberOfPlaces'] = str(int(competition['numberOfPlaces'])-placesRequired)
-    update_competition_points(competition)
+    club['points'] = str(int(club['points'])-placesRequired)
+    update_points_and_places(competition, club)
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
 

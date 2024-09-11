@@ -85,7 +85,7 @@ class TestPurchasePlaces:
         'name':'Club test','email':'club@example.com','points':'20'
     }])
     @patch('server.competitions', [{
-    'name': 'Competition test', 'date': '2020-10-22 13:30:00',
+    'name': 'Competition test', 'date': '2024-10-22 13:30:00',
     'numberOfPlaces': '20'
     }])
     def test_purchase_more_than_12_places(self, client):
