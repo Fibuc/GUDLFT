@@ -1,20 +1,20 @@
 from flask import Flask,render_template,request,redirect,flash,url_for
 
-from utils import loadCompetitions, loadClubs, updateCompetitionPoints, hasEventPassed
+from utils import load_competitions, load_clubs, update_competition_points, has_event_passed
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
-app.jinja_env.filters['has_event_passed'] = hasEventPassed
+app.jinja_env.filters['has_event_passed'] = has_event_passed
 
-competitions = loadCompetitions()
-clubs = loadClubs()
+competitions = load_competitions()
+clubs = load_clubs()
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/showSummary',methods=['POST'])
-def showSummary():
+def show_summary():
     try:
         club = [club for club in clubs if club['email'] == request.form['email']][0]
     except IndexError:
@@ -38,7 +38,7 @@ def book(competition,club):
         return render_template('welcome.html', club=club, competitions=competitions)
 
 @app.route('/purchasePlaces',methods=['POST'])
-def purchasePlaces():
+def purchase_places():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
@@ -51,12 +51,12 @@ def purchasePlaces():
         flash('You cannot book more than 12 places per competition.')
         return render_template('booking.html', club=club, competition=competition), 400
 
-    elif hasEventPassed(competition['date']):
+    elif has_event_passed(competition['date']):
         flash('You cannot book places for an event that has already passed.')
         return render_template('booking.html', club=club, competition=competition), 400
 
     competition['numberOfPlaces'] = str(int(competition['numberOfPlaces'])-placesRequired)
-    updateCompetitionPoints(competition)
+    update_competition_points(competition)
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
 
