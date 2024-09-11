@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 def loadClubs():
     with open('clubs.json') as c:
@@ -18,3 +19,7 @@ def updateCompetitionPoints(competition):
 
         with open('competitions.json', 'w') as file:
             json.dump(all_datas, file, indent=4)
+
+def hasEventPassed(value: str):
+    event_date = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+    return event_date < datetime.now()

@@ -9,7 +9,7 @@ MOCK_CLUB = [{
 
 MOCK_COMPETITION = [{
     'name': 'Competition test',
-    'date': '2020-10-22 13:30:00',
+    'date': '2024-10-22 13:30:00',
     'numberOfPlaces': '7'
 }]
 
@@ -99,3 +99,20 @@ class TestPurchasePlaces:
         )
         assert response.status_code == 400
         assert b'You cannot book more than 12 places per competition.' in response.data
+
+    @patch('server.clubs', MOCK_CLUB)
+    @patch('server.competitions', [{
+    'name': 'Competition test', 'date': '2020-10-22 13:30:00',
+    'numberOfPlaces': '20'
+    }])
+    def test_purchase_event_already_passed(self, client):
+        response = client.post(
+            '/purchasePlaces',
+            data={
+                'competition': 'Competition test',
+                'club': 'Club test',
+                'places': '5'
+            }
+        )
+        assert response.status_code == 400
+        assert b'You cannot book places for an event that has already passed.' in response.data

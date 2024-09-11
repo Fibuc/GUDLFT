@@ -1,9 +1,10 @@
 from flask import Flask,render_template,request,redirect,flash,url_for
 
-from utils import loadCompetitions, loadClubs, updateCompetitionPoints
+from utils import loadCompetitions, loadClubs, updateCompetitionPoints, hasEventPassed
 
 app = Flask(__name__)
 app.secret_key = 'something_special'
+app.jinja_env.filters['has_event_passed'] = hasEventPassed
 
 competitions = loadCompetitions()
 clubs = loadClubs()
@@ -48,6 +49,10 @@ def purchasePlaces():
 
     elif placesRequired > 12:
         flash('You cannot book more than 12 places per competition.')
+        return render_template('booking.html', club=club, competition=competition), 400
+
+    elif hasEventPassed(competition['date']):
+        flash('You cannot book places for an event that has already passed.')
         return render_template('booking.html', club=club, competition=competition), 400
 
     competition['numberOfPlaces'] = str(int(competition['numberOfPlaces'])-placesRequired)
