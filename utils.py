@@ -1,38 +1,36 @@
 import json
 from datetime import datetime
 
+COMPETITION_JSON_FILE = 'competitions.json'
+CLUB_JSON_FILE = 'clubs.json'
+
 def load_clubs():
-    with open('clubs.json') as c:
-        return json.load(c)['clubs']
+    return _load_json(CLUB_JSON_FILE)['clubs']
 
 
 def load_competitions():
-    with open('competitions.json') as comps:
-        return json.load(comps)['competitions']
+    return _load_json(COMPETITION_JSON_FILE)['competitions']
 
 
-def _update_json_file(name_file, element_to_update):
-    if name_file == 'competitions':
-        key_to_update = 'numberOfPlaces'
-
-    elif name_file == 'clubs':
-        key_to_update = 'points'
-
-    with open(f'{name_file}.json', 'r') as file:
-        all_datas = json.load(file)
-        for element in all_datas[name_file]:
-
-            if element['name'] == element_to_update['name']:
-                element[key_to_update] = element_to_update[key_to_update]
-
-        with open(f'{name_file}.json', 'w') as file:
-            json.dump(all_datas, file, indent=4)
+def _load_json(file_name):
+    with open(file_name) as file:
+        return json.load(file)
 
 
-def update_points_and_places(competition, club):
-    _update_json_file('competitions', competition)
-    _update_json_file('clubs', club)
-    
+def _save_json(file_name, datas):
+    with open(file_name, 'w') as file:
+        json.dump(datas, file, indent=4)
+
+
+def update_points_and_places(competitions, clubs):
+    competitions_datas = _load_json(COMPETITION_JSON_FILE)
+    competitions_datas['competitions'] = competitions
+    _save_json(COMPETITION_JSON_FILE, competitions_datas)
+
+    clubs_datas = _load_json(CLUB_JSON_FILE)
+    clubs_datas['clubs'] = clubs
+    _save_json(CLUB_JSON_FILE, clubs_datas)
+
 
 def has_event_passed(value: str):
     event_date = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')

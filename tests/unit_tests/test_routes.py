@@ -11,7 +11,8 @@ MOCK_CLUB = [{
 MOCK_COMPETITION = [{
     'name': 'Competition test',
     'date': '2024-10-22 13:30:00',
-    'numberOfPlaces': 16
+    'numberOfPlaces': 16,
+    'clubs': {}
 }]
 
 class TestShowSummary:
@@ -53,9 +54,10 @@ class TestPurchasePlaces:
 
     def test_purchase_success(self, client):
         competition_mock_copy = deepcopy(MOCK_COMPETITION)
+        club_mock_copy = deepcopy(MOCK_CLUB)
         initial_places = competition_mock_copy[0]['numberOfPlaces']
         places_booked = 5
-        with patch('server.clubs', MOCK_CLUB), patch('server.competitions', competition_mock_copy):
+        with patch('server.clubs', club_mock_copy), patch('server.competitions', competition_mock_copy), patch('server.update_points_and_places') as mock_update:
             response = client.post(
                 '/purchasePlaces',
                 data={
@@ -164,3 +166,20 @@ class TestPurchasePlaces:
         )
         assert response.status_code == 400
         assert b'The number of reservations requested exceeds the number of available places.' in response.data
+
+    @patch('server.clubs', MOCK_CLUB)
+    @patch('server.competitions', [{
+    'name': 'Competition test', 'date': '2025-10-22 13:30:00',
+    'numberOfPlaces': 6, 'clubs': {'Club test': 8}
+    }])
+    def test_purchase_overbooking_with_multiple_reservations(self, client):
+        response = client.post(
+            '/purchasePlaces',
+            data={
+                'competition': 'Competition test',
+                'club': 'Club test',
+                'places': 5
+            }
+        )
+        assert response.status_code == 400
+        assert b'You cannot book more than 12 places per competition.' in response.data
