@@ -116,3 +116,31 @@ class TestPurchasePlaces:
         )
         assert response.status_code == 400
         assert b'You cannot book places for an event that has already passed.' in response.data
+
+    @patch('server.clubs', MOCK_CLUB)
+    @patch('server.competitions', MOCK_COMPETITION)
+    def test_purchase_with_negative_number(self, client):
+        response = client.post(
+            '/purchasePlaces',
+            data={
+                'competition': 'Competition test',
+                'club': 'Club test',
+                'places': -4
+            }
+        )
+        assert response.status_code == 400
+        assert b'You can only book between 1 and 12 places.' in response.data
+
+    @patch('server.clubs', MOCK_CLUB)
+    @patch('server.competitions', MOCK_COMPETITION)
+    def test_purchase_with_string(self, client):
+        response = client.post(
+            '/purchasePlaces',
+            data={
+                'competition': 'Competition test',
+                'club': 'Club test',
+                'places': 'abc'
+            }
+        )
+        assert response.status_code == 400
+        assert b'You can only book between 1 and 12 places.' in response.data

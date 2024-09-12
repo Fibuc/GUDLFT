@@ -24,7 +24,7 @@ def show_summary():
             flash('Invalid email address', 'error')
 
         return render_template('index.html'), 400
-    
+
     return render_template('welcome.html',club=club,competitions=competitions)
 
 @app.route('/book/<competition>/<club>')
@@ -34,32 +34,40 @@ def book(competition,club):
     if foundClub and foundCompetition:
         return render_template('booking.html',club=foundClub,competition=foundCompetition)
     else:
-        flash("Something went wrong-please try again")
+        flash('Something went wrong-please try again', 'error')
         return render_template('welcome.html', club=club, competitions=competitions)
 
 @app.route('/purchasePlaces',methods=['POST'])
 def purchase_places():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
-    placesRequired = int(request.form['places'])
+    try:
+        placesRequired = int(request.form['places'])
+
+    except ValueError:
+        flash('You can only book between 1 and 12 places.', 'error')
+        return render_template('booking.html', club=club, competition=competition), 400
 
     if has_event_passed(competition['date']):
-        flash('You cannot book places for an event that has already passed.')
+        flash('You cannot book places for an event that has already passed.', 'error')
+        return render_template('booking.html', club=club, competition=competition), 400
+
+    elif placesRequired < 1:
+        flash('You can only book between 1 and 12 places.', 'error')
         return render_template('booking.html', club=club, competition=competition), 400
 
     elif placesRequired > club['points']:
-        flash('You do not have enough points to book that many places.')
+        flash('You do not have enough points to book that many places.', 'error')
         return render_template('booking.html', club=club, competition=competition), 400
 
     elif placesRequired > 12:
-        flash('You cannot book more than 12 places per competition.')
+        flash('You cannot book more than 12 places per competition.', 'error')
         return render_template('booking.html', club=club, competition=competition), 400
 
-
-    competition['numberOfPlaces'] = competition['numberOfPlaces']-placesRequired
-    club['points'] = club['points']-placesRequired
+    competition['numberOfPlaces'] = competition['numberOfPlaces'] - placesRequired
+    club['points'] = club['points'] - placesRequired
     update_points_and_places(competition, club)
-    flash('Great-booking complete!')
+    flash('Great-booking complete!', 'success')
     return render_template('welcome.html', club=club, competitions=competitions)
 
 
