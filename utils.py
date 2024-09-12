@@ -37,3 +37,14 @@ def update_points_and_places(competition, club):
 def has_event_passed(value: str):
     event_date = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
     return event_date < datetime.now()
+
+
+def get_usable_points(competition, club):
+    points = 12
+    if club['points'] < points:
+        points = club['points']
+
+    if competition['numberOfPlaces'] < points:
+        points = competition['numberOfPlaces']
+    
+    return points

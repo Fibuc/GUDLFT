@@ -1,5 +1,6 @@
 from tests.conftests import client
 from unittest.mock import patch
+from copy import deepcopy
 
 MOCK_CLUB = [{
     'name': 'Club test',
@@ -10,7 +11,7 @@ MOCK_CLUB = [{
 MOCK_COMPETITION = [{
     'name': 'Competition test',
     'date': '2024-10-22 13:30:00',
-    'numberOfPlaces': 7
+    'numberOfPlaces': 16
 }]
 
 class TestShowSummary:
@@ -51,9 +52,10 @@ class TestShowSummary:
 class TestPurchasePlaces:
 
     def test_purchase_success(self, client):
-        initial_places = MOCK_COMPETITION[0]['numberOfPlaces']
+        competition_mock_copy = deepcopy(MOCK_COMPETITION)
+        initial_places = competition_mock_copy[0]['numberOfPlaces']
         places_booked = 5
-        with patch('server.clubs', MOCK_CLUB), patch('server.competitions', MOCK_COMPETITION):
+        with patch('server.clubs', MOCK_CLUB), patch('server.competitions', competition_mock_copy):
             response = client.post(
                 '/purchasePlaces',
                 data={
@@ -65,11 +67,12 @@ class TestPurchasePlaces:
             assert response.status_code == 200
             assert b'Great-booking complete!' in response.data
             expected_places = initial_places - places_booked
-            assert int(MOCK_COMPETITION[0]['numberOfPlaces']) == expected_places
+            assert int(competition_mock_copy[0]['numberOfPlaces']) == expected_places
 
     @patch('server.clubs', MOCK_CLUB)
     @patch('server.competitions', MOCK_COMPETITION)
     def test_purchase_not_enough_club_points(self, client):
+        print(MOCK_COMPETITION[0]['numberOfPlaces'])
         response = client.post(
             '/purchasePlaces',
             data={
@@ -94,7 +97,7 @@ class TestPurchasePlaces:
             data={
                 'competition': 'Competition test',
                 'club': 'Club test',
-                'places': '15'
+                'places': 15
             }
         )
         assert response.status_code == 400
@@ -144,3 +147,20 @@ class TestPurchasePlaces:
         )
         assert response.status_code == 400
         assert b'You can only book between 1 and 12 places.' in response.data
+
+    @patch('server.clubs', MOCK_CLUB)
+    @patch('server.competitions', [{
+    'name': 'Competition test', 'date': '2025-10-22 13:30:00',
+    'numberOfPlaces': 6
+    }])
+    def test_purchase_overbooking(self, client):
+        response = client.post(
+            '/purchasePlaces',
+            data={
+                'competition': 'Competition test',
+                'club': 'Club test',
+                'places': 8
+            }
+        )
+        assert response.status_code == 400
+        assert b'The number of reservations requested exceeds the number of available places.' in response.data

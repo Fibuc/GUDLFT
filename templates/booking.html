@@ -11,12 +11,7 @@ Places available: {{competition['numberOfPlaces']}}
     <input type="hidden" name="club" value="{{club['name']}}">
     <input type="hidden" name="competition" value="{{competition['name']}}">
     <label for="places">How many places?</label>
-    {% set points = club['points'] | int %}
-    {% if points < 12 %}
-    <input type="number" name="places" min="1" max="{{ points }}" value="1"/>
-    {% else %}
-    <input type="number" name="places" min="1" max="12" value="1"/>
-    {% endif %}
+    <input type="number" name="places" min="1" max="{{ usable_points }}" value="1"/>
     <button type="submit">Book</button>
 
     {% include 'messages.html' %}
