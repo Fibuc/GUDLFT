@@ -1,6 +1,10 @@
 from tests.conftests import client
 from unittest.mock import patch
 from copy import deepcopy
+from urllib.parse import unquote
+
+from flask import request, url_for
+
 
 MOCK_CLUB = [{
     'name': 'Club test',
@@ -64,9 +68,13 @@ class TestPurchasePlaces:
                     'competition': 'Competition test',
                     'club': 'Club test',
                     'places': places_booked
-                }
+                },
+                follow_redirects=True
             )
+
+            assert request.path == unquote(url_for('success_purchase', club_email=club_mock_copy[0]['email']))
             assert response.status_code == 200
+
             assert b'Great-booking complete!' in response.data
             expected_places = initial_places - places_booked
             assert int(competition_mock_copy[0]['numberOfPlaces']) == expected_places
