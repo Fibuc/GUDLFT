@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+{% endblock style %}
+
+{% block title %}
+<title>GUDLFT | Club points board</title>
+{% endblock title %}
+
+{% block content %}
+
+
+<h2>Club points board</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Club name</th>
+            <th>Club points</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {% for club in clubs %}
+        <tr>
+            <td class="club_name">{{ club['name'] }}</td>
+            <td class="club_points">{{ club['points'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<br>
+
+<button type="button" onclick="history.back();">Back</button>
+{% endblock content %}

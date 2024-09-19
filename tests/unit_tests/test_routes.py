@@ -191,3 +191,15 @@ class TestPurchasePlaces:
         )
         assert response.status_code == 400
         assert b'You cannot book more than 12 places per competition.' in response.data
+
+
+class TestPointsClubBoard:
+
+    def test_get_club_points_board(self, client):
+        response = client.get('/clubPointsBoard')
+        assert response.status_code == 200
+        assert b'GUDLFT | Club points board' in response.data
+
+    def test_post_club_points_board(self, client):
+        response = client.post('/clubPointsBoard', data=MOCK_CLUB[0])
+        assert response.status_code == 405

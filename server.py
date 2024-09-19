@@ -94,9 +94,16 @@ def success_purchase(club_email):
     club = [club for club in clubs if club['email'] == club_email][0]
     return render_template('welcome.html', club=club, competitions=competitions)
 
-# TODO: Add route for points display
+
+@app.route('/clubPointsBoard', methods=['GET'])
+def club_points_board():
+    return render_template('club_points_board.html', clubs=clubs)
 
 
 @app.route('/logout')
 def logout():
     return redirect(url_for('index'))
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
