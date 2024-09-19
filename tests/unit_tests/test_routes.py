@@ -72,7 +72,7 @@ class TestPurchasePlaces:
                 follow_redirects=True
             )
 
-            assert request.path == unquote(url_for('success_purchase', club_email=club_mock_copy[0]['email']))
+            assert response.request.path == unquote(url_for('success_purchase', club_email=club_mock_copy[0]['email']))
             assert response.status_code == 200
 
             assert b'Great-booking complete!' in response.data
