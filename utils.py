@@ -1,8 +1,9 @@
 import json
 from datetime import datetime
+from pathlib import Path
 
-COMPETITION_JSON_FILE = 'competitions.json'
-CLUB_JSON_FILE = 'clubs.json'
+COMPETITION_JSON_FILE = Path(__file__).parent / 'competitions.json'
+CLUB_JSON_FILE = Path(__file__).parent / 'clubs.json'
 
 def load_clubs():
     return _load_json(CLUB_JSON_FILE)['clubs']
@@ -17,7 +18,7 @@ def _load_json(file_name):
         return json.load(file)
 
 
-def _save_json(file_name, datas):
+def save_json(file_name, datas):
     with open(file_name, 'w') as file:
         json.dump(datas, file, indent=4)
 
@@ -25,11 +26,11 @@ def _save_json(file_name, datas):
 def update_points_and_places(competitions, clubs):
     competitions_datas = _load_json(COMPETITION_JSON_FILE)
     competitions_datas['competitions'] = competitions
-    _save_json(COMPETITION_JSON_FILE, competitions_datas)
+    save_json(COMPETITION_JSON_FILE, competitions_datas)
 
     clubs_datas = _load_json(CLUB_JSON_FILE)
     clubs_datas['clubs'] = clubs
-    _save_json(CLUB_JSON_FILE, clubs_datas)
+    save_json(CLUB_JSON_FILE, clubs_datas)
 
 
 def has_event_passed(value: str):
