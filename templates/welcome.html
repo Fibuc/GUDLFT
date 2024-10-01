@@ -19,7 +19,7 @@
         {{comp['name']}}<br />
         Date: {{comp['date']}}<br/>
         Number of Places: {{comp['numberOfPlaces']}}
-        {% if comp['numberOfPlaces'] > 0 and not comp['date'] | has_event_passed and club['points'] > 0 %}
+        {% if comp['numberOfPlaces'] > 0 and not comp['date'] | has_event_passed and club['points'] > 0 and (club['name'] not in comp['clubs'] or comp['clubs'][club['name']] < 12) %}
             <a href="{{ url_for('book',competition=comp['name'],club=club['name']) }}">Book Places</a>
         {% endif %}
     </li>

@@ -39,11 +39,19 @@ def has_event_passed(value: str):
 
 
 def get_usable_points(competition, club):
-    points = 12
+    points = max_booking_place = 12
     if club['points'] < points:
         points = club['points']
 
     if competition['numberOfPlaces'] < points:
         points = competition['numberOfPlaces']
-    
+
+    try:
+        points_used = competition['clubs'][club['name']]
+        if max_booking_place - points_used < points:
+            points = max_booking_place - points_used
+
+    except KeyError:
+        pass
+
     return points
