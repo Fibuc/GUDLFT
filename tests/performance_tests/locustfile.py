@@ -1,8 +1,9 @@
-from pathlib import Path
-
 from locust import HttpUser, task, between
 
-from utils import load_clubs, load_competitions, save_json, CLUB_JSON_FILE, COMPETITION_JSON_FILE
+from utils import (
+    load_clubs, load_competitions, save_json,
+    CLUB_JSON_FILE, COMPETITION_JSON_FILE
+)
 
 
 class ProjectPerfTest(HttpUser):
@@ -19,7 +20,9 @@ class ProjectPerfTest(HttpUser):
 
     def on_stop(self):
         save_json(CLUB_JSON_FILE, datas={'clubs': self.clubs})
-        save_json(COMPETITION_JSON_FILE, datas={'competitions': self.competitions})
+        save_json(
+            COMPETITION_JSON_FILE, datas={'competitions': self.competitions}
+        )
 
     @task
     def index(self):
@@ -28,7 +31,7 @@ class ProjectPerfTest(HttpUser):
     @task
     def login(self):
         self.client.post('/showSummary', {'email': self.club['email']})
-        
+
     @task
     def logout(self):
         self.client.get('/logout')
@@ -39,7 +42,9 @@ class ProjectPerfTest(HttpUser):
 
     @task
     def book(self):
-        self.client.get(f'/book/{self.competition['name']}/{self.club['name']}')
+        self.client.get(
+            f'/book/{self.competition['name']}/{self.club['name']}'
+        )
 
     @task
     def purchase(self):
@@ -50,6 +55,6 @@ class ProjectPerfTest(HttpUser):
                 'places': 1
             })
             self.current_execution_purchase += 1
-        
+
         else:
             self.stop(True)

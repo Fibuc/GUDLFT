@@ -1,7 +1,8 @@
 from unittest.mock import patch
-from tests.conftests import client, get_club_datas, get_competition_datas, data_post
+from tests.conftests import (
+    client, get_club_datas, get_competition_datas, data_post
+)
 import server
-import utils
 
 
 class TestPurchaseUpdate:
@@ -17,9 +18,15 @@ class TestPurchaseUpdate:
             initial_club_points = club['points']
             initial_competitions_places = competition['numberOfPlaces']
             requested_places = data_post['places']
-            purchase_response = client.post('/purchasePlaces', data=data_post, follow_redirects=True)
+            purchase_response = client.post(
+                '/purchasePlaces', data=data_post, follow_redirects=True
+            )
             assert purchase_response.status_code == 200
-            assert server.clubs[0]['points'] == initial_club_points - requested_places
-            assert server.competitions[0]['numberOfPlaces'] == initial_competitions_places - requested_places
+            assert server.clubs[0]['points'] == (
+                initial_club_points - requested_places
+            )
+            assert server.competitions[0]['numberOfPlaces'] == (
+                initial_competitions_places - requested_places
+            )
             assert club['name'] in competition['clubs']
             assert requested_places == competition['clubs'][club['name']]

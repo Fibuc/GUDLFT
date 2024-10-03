@@ -8,3 +8,4 @@ private/
 pyvenv.cfg
 __pycache__
 .coverage
+flake8_report/

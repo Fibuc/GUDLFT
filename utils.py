@@ -5,11 +5,22 @@ from pathlib import Path
 COMPETITION_JSON_FILE = Path(__file__).parent / 'competitions.json'
 CLUB_JSON_FILE = Path(__file__).parent / 'clubs.json'
 
+
 def load_clubs():
+    """Loads all the clubs from the clubs.json file.
+
+    Returns:
+        list: List of clubs.
+    """
     return _load_json(CLUB_JSON_FILE)['clubs']
 
 
 def load_competitions():
+    """Loads all the competitions from the competitions.json file.
+
+    Returns:
+        list: List of competitions.
+    """
     return _load_json(COMPETITION_JSON_FILE)['competitions']
 
 
@@ -39,6 +50,7 @@ def has_event_passed(value: str):
 
 
 def get_usable_points(competition, club):
+    """Returns the maximum number of points usable during booking."""
     points = max_booking_place = 12
     if club['points'] < points:
         points = club['points']
@@ -46,6 +58,7 @@ def get_usable_points(competition, club):
     if competition['numberOfPlaces'] < points:
         points = competition['numberOfPlaces']
 
+    # Checks the history to see if the club has already used points.
     try:
         points_used = competition['clubs'][club['name']]
         if max_booking_place - points_used < points:

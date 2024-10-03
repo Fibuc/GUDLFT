@@ -1,7 +1,6 @@
 from tests.conftests import get_competition_datas, get_club_datas
-from unittest.mock import patch
 import utils
-import server
+
 
 class TestLoadElements:
 
@@ -19,16 +18,18 @@ class TestLoadElements:
 
 
 class TestCompetitionDate:
-    
+
+    # Happy path
     def test_past_competition_date(self):
         competition_date = get_competition_datas('past')[0]['date']
         competion_already_past = utils.has_event_passed(competition_date)
-        assert competion_already_past == True
+        assert competion_already_past is True
 
+    # Sad path
     def test_future_competition_date(self):
         competition_date = get_competition_datas()[0]['date']
         competion_already_past = utils.has_event_passed(competition_date)
-        assert competion_already_past == False
+        assert competion_already_past is False
 
 
 class TestGetUsablePoints:
